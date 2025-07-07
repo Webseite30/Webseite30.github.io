@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Supermarkt - Login</title>
+  <style>
+    body {
+      background: #FFF8E1;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #fff9c4;
+      padding: 30px 30px 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(255, 193, 7, 0.3);
+      width: 380px;
+      box-sizing: border-box;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .header h2 {
+      color: #fbc02d;
+      font-weight: 700;
+      font-size: 28px;
+      margin: 0;
+      text-shadow: 0 0 6px #f9a825;
+    }
+    label {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 18px;
+      font-size: 15px;
+      color: #5d4037;
+    }
+    input {
+      padding: 12px 14px;
+      margin-top: 6px;
+      border: 2px solid #fbc02d;
+      border-radius: 10px;
+      background: #fffde7;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+    input:focus {
+      border-color: #f9a825;
+      outline: none;
+    }
+
+    /* Buttons diesmal vertikal angeordnet */
+    .btn-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 24px;
+    }
+
+    .btn-primary {
+      background: #fbc02d;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #5d4037;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(251, 192, 45, 0.6);
+      transition: background 0.3s ease;
+      width: 100%;
+    }
+    .btn-primary:hover {
+      background: #f9a825;
+      box-shadow: 0 6px 16px rgba(249, 168, 37, 0.8);
+    }
+
+    .btn-secondary {
+      background: #5d4037;
+      color: #fffde7;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 0;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(93, 64, 55, 0.6);
+      transition: background 0.3s ease;
+      width: 100%;
+    }
+    .btn-secondary:hover {
+      background: #3e2723;
+      box-shadow: 0 6px 16px rgba(62, 39, 35, 0.8);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="header">
+      <h2>Supermarkt Login</h2>
+    </div>
+    <form id="loginForm">
+      <label for="username">Kunden-ID
+        <input type="text" id="username" required autocomplete="off" />
+      </label>
+      <label for="password">Passwort
+        <input type="password" id="password" required autocomplete="current-password" />
+      </label>
+      <div class="btn-container">
+        <button type="submit" class="btn-primary">Anmelden</button>
+        <button type="button" class="btn-secondary" id="registerBtn">Registrieren</button>
+      </div>
+    </form>
+  </div>
+
+  <script defer>
+    document.addEventListener('DOMContentLoaded', () => {
+      const startTime = Date.now();
+      const params = Object.fromEntries(new URLSearchParams(window.location.search).entries());
+
+      const usernameInput = document.getElementById('username');
+      usernameInput.value = params.username || '';
+
+      const form = document.getElementById('loginForm');
+      const registerBtn = document.getElementById('registerBtn');
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const u = document.getElementById('username').value;
+        const pw = document.getElementById('password').value;
+        if (pw !== params.password) {
+          alert('Passwort stimmt nicht.');
+          return;
+        }
+        const lt = ((Date.now() - startTime) / 1000).toFixed(2);
+        const target = `https://webseite40.github.io/index.html?username=${encodeURIComponent(u)}&password=${encodeURIComponent(pw)}&regtime=${params.regtime}&logintime=${lt}&startStep=5`;
+        console.log('Redirect to:', target);
+        window.location.href = target;
+      });
+
+      registerBtn.addEventListener('click', () => {
+        window.location.href = 'register.html';
+      });
+    });
+  </script>
+</body>
+</html>
