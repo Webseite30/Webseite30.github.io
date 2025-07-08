@@ -37,7 +37,7 @@
       flex-direction: column;
       margin-bottom: 18px;
       font-size: 15px;
-      color: #5d4037;
+      color: #4e342e;
     }
     input {
       padding: 12px 14px;
@@ -46,6 +46,7 @@
       border-radius: 10px;
       background: #fffde7;
       font-size: 14px;
+      color: #4e342e;
       transition: border-color 0.3s ease;
     }
     input:focus {
@@ -53,10 +54,9 @@
       outline: none;
     }
 
-    /* Button Container mit umgekehrter Reihenfolge */
     .btn-container {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       margin-top: 24px;
     }
 
@@ -71,31 +71,10 @@
       cursor: pointer;
       box-shadow: 0 4px 10px rgba(251, 192, 45, 0.5);
       transition: background 0.3s ease;
-      flex: 1;
-      margin-left: 12px;
     }
     .btn-primary:hover {
       background: #f9a825;
       box-shadow: 0 6px 14px rgba(249, 168, 37, 0.7);
-    }
-
-    .btn-secondary {
-      background: #5d4037;
-      color: #fffde7;
-      border: none;
-      border-radius: 12px;
-      padding: 14px 26px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(93, 64, 55, 0.5);
-      transition: background 0.3s ease;
-      flex: 1;
-      margin-right: 12px;
-    }
-    .btn-secondary:hover {
-      background: #3e2723;
-      box-shadow: 0 6px 14px rgba(62, 39, 35, 0.7);
     }
   </style>
 </head>
@@ -112,9 +91,7 @@
         <input type="password" id="password" required autocomplete="new-password" />
       </label>
       <div class="btn-container">
-        <!-- Anmelde-Button links -->
-        <button type="button" class="btn-secondary" id="loginBtn">Anmelden</button>
-        <!-- Registrieren-Button rechts -->
+        <!-- Nur Registrieren-Button -->
         <button type="submit" class="btn-primary">Registrieren</button>
       </div>
     </form>
@@ -124,7 +101,6 @@
     document.addEventListener('DOMContentLoaded', () => {
       const startTime = Date.now();
       const form = document.getElementById('registerForm');
-      const loginBtn = document.getElementById('loginBtn');
 
       form.addEventListener('submit', e => {
         e.preventDefault();
@@ -134,10 +110,6 @@
         const url = `login.html?username=${encodeURIComponent(u)}&password=${encodeURIComponent(p)}&regtime=${rt}`;
         console.log('Redirect to:', url);
         window.location.href = url;
-      });
-
-      loginBtn.addEventListener('click', () => {
-        window.location.href = 'login.html';
       });
     });
   </script>
