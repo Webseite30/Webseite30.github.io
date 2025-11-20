@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrierung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        form {
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        input, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Registrierung</h2>
+
+<form id="registerForm">
+    <label>Benutzername</label>
+    <input type="text" id="username" required>
+
+    <label>Passwort</label>
+    <input type="password" id="password" required>
+
+    <button type="submit">Registrieren</button>
+</form>
+
+<p id="status"></p>
+
+<script>
+// Startzeit messen
+const startTime = Date.now();
+
+// SHA-256 Hash Funktion (Browser basiert)
+async function hashPassword(password) {
+    const msgBuffer = new TextEncoder().encode(password);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    return hashHex;
+}
+
+document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const timeSpent = Date.now() - startTime;
+    const passwordHash = await hashPassword(password);
+
+    const data = {
+        username: username,
+        passwordHash: passwordHash,
+        timeSpentMs: timeSpent
+    };
+
+    const response = await fetch("/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    if (response.ok) {
+        document.getElementById("status").innerText = "Registrierung erfolgreich!";
+        setTimeout(() => {
+            window.location.href = "/login.html";
+        }, 1000);
+    } else {
+        document.getElementById("status").innerText = "Fehler bei der Registrierung.";
+    }
+});
+</script>
+
+</body>
+</html>
