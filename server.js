@@ -1,67 +1,42 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const path = require("path");
+import express from "express";
+import pkg from "pg";
+import crypto from "crypto";
+
+const { Pool } = pkg;
 const app = express();
-
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
 
-// --- MongoDB Verbindung ---
-mongoose.connect("mongodb+srv://hinsenan_db_user:<db_password>@cluster0.rwgqssd.mongodb.net/?appName=Cluster0", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => console.log("MongoDB verbunden"))
-  .catch(err => console.error(err));
-
-// --- Schema und Modell ---
-const userSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },
-    passwordHash: { type: String, required: true },
-    registrationTimeMs: Number,
-    loginTimeMs: Number,
-    timestamp: { type: Date, default: Date.now }
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
 });
 
-const User = mongoose.model("User", userSchema);
-
-// --- Registrierung ---
 app.post("/register", async (req, res) => {
-    try {
-        const { username, passwordHash, timeSpentMs } = req.body;
-        const user = new User({
-            username,
-            passwordHash,
-            registrationTimeMs: timeSpentMs
-        });
-        await user.save();
-        res.status(200).send("Registrierung erfolgreich");
-    } catch (err) {
-        console.error(err);
-        res.status(400).send("Fehler bei Registrierung (Benutzername eventuell schon vorhanden)");
-    }
+  const { username, password, duration_ms } = req.body;
+  const hash = crypto.createHash("sha256").update(password).digest("hex");
+
+  await pool.query(
+    "INSERT INTO users (username, hash, reg_time_ms) VALUES ($1, $2, $3) ON CONFLICT DO NOTHING",
+    [username, hash, duration_ms]
+  );
+
+  res.send("registered");
 });
 
-// --- Login ---
 app.post("/login", async (req, res) => {
-    const { username, passwordHash, timeSpentMs } = req.body;
-    const user = await User.findOne({ username });
+  const { username, password, duration_ms } = req.body;
+  const hash = crypto.createHash("sha256").update(password).digest("hex");
 
-    if (!user) return res.status(401).send("Benutzer nicht gefunden");
-    if (user.passwordHash !== passwordHash) return res.status(401).send("Falsches Passwort");
+  const result = await pool.query(
+    "SELECT 1 FROM users WHERE username=$1 AND hash=$2",
+    [username, hash]
+  );
 
-    // Login-Zeit speichern
-    user.loginTimeMs = timeSpentMs;
-    await user.save();
+  await pool.query(
+    "INSERT INTO logins (username, login_time_ms, success) VALUES ($1, $2, $3)",
+    [username, duration_ms, result.rowCount > 0]
+  );
 
-    res.status(200).send("Login erfolgreich");
+  res.send(result.rowCount > 0 ? "login ok" : "login failed");
 });
 
-// --- Daten anzeigen (nur für dich) ---
-app.get("/view", async (req, res) => {
-    const users = await User.find({}, "-_id username passwordHash registrationTimeMs loginTimeMs timestamp");
-    res.json(users);
-});
-
-// --- Server starten ---
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server läuft auf Port ${PORT}`));
+app.listen(3000, () => console.log("Server läuft auf Port 3000"));
