@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Studie – Anmeldung</title>
+</head>
+<body>
+  <h2 id="title">Registrierung</h2>
+
+  <form id="form">
+    <label>Username</label>
+    <input name="username" required>
+
+    <label id="pwLabel">Passwort</label>
+    <input name="password" type="password" required>
+
+    <button id="submitBtn">Absenden</button>
+  </form>
+
+  <p>
+    <a href="#" id="switch">Zum Login wechseln</a>
+  </p>
+
+  <pre id="log"></pre>
+
+<script>
+let mode = "register";
+let startTime = null;
+
+// Startzeit messen
+document.querySelectorAll("input").forEach(el => {
+  el.addEventListener("input", () => { if (!startTime) startTime = performance.now(); });
+});
+
+// Formular absenden
+document.getElementById("form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const data = Object.fromEntries(new FormData(e.target));
+  const duration = Math.round(performance.now() - (startTime || performance.now()));
+  startTime = null;
+
+  data.duration_ms = duration;
+
+  const url = mode === "register" ? "/register" : "/login";
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  document.getElementById("log").textContent =
+    "Antwort: " + (await res.text());
+});
+
+// Modus wechseln
+document.getElementById("switch").onclick = () => {
+  if (mode === "register") {
+    mode = "login";
+    document.getElementById("title").textContent = "Login";
+    document.getElementById("switch").textContent = "Zur Registrierung wechseln";
+  } else {
+    mode = "register";
+    document.getElementById("title").textContent = "Registrierung";
+    document.getElementById("switch").textContent = "Zum Login wechseln";
+  }
+};
+</script>
+</body>
+</html>
