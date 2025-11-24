@@ -72,13 +72,15 @@ let startTime = null;
 // SCREEN SWITCHING & TIMER
 // ---------------------------
 function show(screenId) {
-  // Alle Screens ausblenden
+  // Alle Screens verstecken
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  // Gewünschten Screen anzeigen
+  // Gewünschten Screen zeigen
   document.getElementById(screenId).classList.add("active");
 
-  // Timer für diesen Screen starten
-  startTime = performance.now();
+  // Timer NUR starten, wenn gerade KEIN Timer läuft
+  if (startTime === null) {
+    startTime = performance.now();
+  }
 }
 
 document.getElementById("goToLoginBtn").onclick = () => {
@@ -102,23 +104,30 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 
   document.getElementById("regError").textContent = "";
 
-  // Dauer messen (Timer vom Screenstart)
-  data.duration_ms = Math.round(performance.now() - startTime);
-  startTime = null;
-
- const res = await fetch("/register", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(data)
-});
+  const res = await fetch("/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 
   const result = await res.text();
 
-
-
   if (result === "registered") {
+    // Timer nur JETZT stoppen
+    data.duration_ms = Math.round(performance.now() - startTime);
+    startTime = null;
+
+    // Erfolg
     document.getElementById("registerForm").reset();
     show("successScreen");
+
+    // Dauer an DB senden
+    await fetch("/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...data })
+    });
+
   } else {
     document.getElementById("regError").textContent = "Fehler: " + result;
   }
@@ -129,15 +138,8 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 // ---------------------------
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
-
-  // Timer neu starten für jeden Login-Versuch
-  dataStart = performance.now();
-
   const data = Object.fromEntries(new FormData(e.target));
   data.site_name = siteName;
-
-  data.duration_ms = Math.round(performance.now() - startTime);
-  startTime = null;
 
   const res = await fetch("/login", {
     method: "POST",
@@ -148,15 +150,27 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const result = await res.text();
 
   if (result === "login ok") {
-    document.getElementById("loginError").textContent = "";
+    // Timer nur JETZT stoppen
+    data.duration_ms = Math.round(performance.now() - startTime);
+    startTime = null;
+
+    // Erfolg
     document.getElementById("loginForm").reset();
+    document.getElementById("loginError").textContent = "";
     show("loginSuccessScreen");
+
+    // Dauer an DB senden
+    await fetch("/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...data })
+    });
+
   } else {
-    document.getElementById("loginError").textContent = "Login fehlgeschlagen! Bitte erneut versuchen.";
-    startTime = performance.now(); // Timer für den nächsten Versuch wieder starten
+    document.getElementById("loginError").textContent = "Login fehlgeschlagen!";
+    // Timer läuft weiter!
   }
 });
-
-
 </script>
+
 
