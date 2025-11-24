@@ -61,28 +61,23 @@ const siteName = "Webseite_1";
 let startTime = null;
 
 // ---------------------------
-// SCREEN SWITCHING
+// SCREEN SWITCHING & TIMER
 // ---------------------------
 function show(screenId) {
+  // Alle Screens ausblenden
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  // Gewünschten Screen anzeigen
   document.getElementById(screenId).classList.add("active");
+
+  // Timer für diesen Screen starten
+  startTime = performance.now();
 }
 
 document.getElementById("goToLoginBtn").onclick = () => {
-  // Felder zurücksetzen
   document.getElementById("loginForm").reset();
   document.getElementById("loginError").textContent = "";
   show("loginScreen");
 };
-
-// ---------------------------
-// TIMER START
-// ---------------------------
-document.querySelectorAll("input").forEach(el => {
-  el.addEventListener("input", () => {
-    if (!startTime) startTime = performance.now();
-  });
-});
 
 // ---------------------------
 // REGISTRIERUNG
@@ -99,21 +94,15 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 
   document.getElementById("regError").textContent = "";
 
+  // Dauer messen (Timer vom Screenstart)
   data.duration_ms = Math.round(performance.now() - startTime);
   startTime = null;
 
-  // Dummy fetch für Demo-Zwecke
-  // const res = await fetch("/register", { ... });
-  // const result = await res.text();
-
-  const result = "registered"; // Demo-Resultat
+  // Dummy-Ergebnis
+  const result = "registered";
 
   if (result === "registered") {
-    // Felder zurücksetzen
     document.getElementById("registerForm").reset();
-    document.getElementById("regError").textContent = "";
-
-    // Direkt zum Erfolgsbildschirm
     show("successScreen");
   } else {
     document.getElementById("regError").textContent = "Fehler: " + result;
@@ -131,12 +120,14 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   data.duration_ms = Math.round(performance.now() - startTime);
   startTime = null;
 
-  // Dummy fetch für Demo-Zwecke
-  // const res = await fetch("/login", { ... });
-  // const result = await res.text();
-
-  const result = "login ok"; // Demo-Resultat
+  // Dummy-Ergebnis
+  const result = "login ok";
 
   if (result === "login ok") {
     document.getElementById("loginError").textContent = "Login erfolgreich!";
-  } else
+  } else {
+    document.getElementById("loginError").textContent = "Login fehlgeschlagen!";
+  }
+});
+</script>
+
