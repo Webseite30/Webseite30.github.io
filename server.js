@@ -27,6 +27,7 @@ async function initDb() {
       username TEXT,
       hash TEXT,
       action_type TEXT NOT NULL,
+      attempts INT
       success BOOLEAN,
       duration_ms INT,
       site_name TEXT,
@@ -39,16 +40,16 @@ async function initDb() {
 
 // ===== Registrierung =====
 app.post("/register", async (req, res) => {
-  const { username, password, duration_ms, site_name } = req.body;
+  const { username, password, duration_ms, site_name, attempts } = req.body;
   if (!username || !password || !site_name) return res.status(400).send("Missing data");
 
   const hash = crypto.createHash("sha256").update(password).digest("hex");
 
   try {
     await pool.query(
-      `INSERT INTO actions (username, hash, action_type, success, duration_ms, site_name)
-       VALUES ($1, $2, 'register', true, $3, $4)`,
-      [username, hash, duration_ms, site_name]
+      `INSERT INTO actions (username, hash, action_type, success, duration_ms, site_name, attempts)
+       VALUES ($1, $2, 'register', true, $3, $4, $5)`,
+      [username, hash, duration_ms, site_name, attempts]
     );
     res.send("registered");
   } catch (e) {
@@ -60,7 +61,7 @@ app.post("/register", async (req, res) => {
 
 // ===== Login =====
 app.post("/login", async (req, res) => {
-  const { username, password, duration_ms, site_name } = req.body;
+  const { username, password, duration_ms, site_name, attempts } = req.body;
   if (!username || !password || !site_name) return res.status(400).send("Missing data");
 
   const hash = crypto.createHash("sha256").update(password).digest("hex");
@@ -74,9 +75,9 @@ app.post("/login", async (req, res) => {
     const success = result.rowCount > 0;
 
     await pool.query(
-      `INSERT INTO actions (username, action_type, success, duration_ms, site_name)
-       VALUES ($1, 'login', $2, $3, $4)`,
-      [username, success, duration_ms, site_name]
+      `INSERT INTO actions (username, action_type, success, duration_ms, site_name, attempts)
+       VALUES ($1, 'login', $2, $3, $4, $5)`,
+      [username, success, duration_ms, site_name, attempts]
     );
 
     res.send(success ? "login ok" : "login failed");
@@ -85,6 +86,7 @@ app.post("/login", async (req, res) => {
     res.status(500).send("DB error");
   }
 });
+
 
 // ===== Server starten =====
 app.listen(3000, async () => {
