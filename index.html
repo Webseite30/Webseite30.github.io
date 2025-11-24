@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Studie – Anmeldung</title>
+  <title>Meine Studie</title>
   <style>
     .screen { display: none; }
     .active { display: block; }
@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<!-- Registrierung / Login Screen -->
+<!-- Registrierung / Login -->
 <div id="formScreen" class="screen active">
   <h2 id="title">Registrierung</h2>
 
@@ -20,7 +20,7 @@
     <label>Username</label>
     <input name="username" required>
 
-    <label id="pwLabel">Passwort</label>
+    <label>Passwort</label>
     <input name="password" type="password" required>
 
     <label>Passwort wiederholen</label>
@@ -31,10 +31,7 @@
 
   <p class="error" id="errorMsg"></p>
 
-  <p>
-    <a href="#" id="switch">Zum Login wechseln</a>
-  </p>
-
+  <p><a href="#" id="switch">Zum Login wechseln</a></p>
   <pre id="log"></pre>
 </div>
 
@@ -46,7 +43,9 @@
 </div>
 
 <script>
-let mode = "register"; // register oder login
+const siteName = "Meine Studie"; // Name der Webseite
+
+let mode = "register";
 let startTime = null;
 
 // Startzeit messen
@@ -59,6 +58,7 @@ document.getElementById("form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const data = Object.fromEntries(new FormData(e.target));
+  data.site_name = siteName;
 
   // Passwort-Check bei Registrierung
   if (mode === "register" && data.password !== data.passwordConfirm) {
@@ -70,7 +70,6 @@ document.getElementById("form").addEventListener("submit", async (e) => {
 
   const duration = Math.round(performance.now() - (startTime || performance.now()));
   startTime = null;
-
   data.duration_ms = duration;
 
   const url = mode === "register" ? "/register" : "/login";
@@ -84,7 +83,6 @@ document.getElementById("form").addEventListener("submit", async (e) => {
   const text = await res.text();
 
   if (mode === "register" && res.ok) {
-    // Registrierung erfolgreich → Erfolgs-Screen zeigen
     document.getElementById("formScreen").classList.remove("active");
     document.getElementById("successScreen").classList.add("active");
     return;
@@ -101,8 +99,6 @@ document.getElementById("switch").onclick = (e) => {
     document.getElementById("title").textContent = "Login";
     document.getElementById("submitBtn").textContent = "Login";
     document.getElementById("switch").textContent = "Zur Registrierung wechseln";
-
-    // Passwort-Bestätigung ausblenden beim Login
     document.querySelector('input[name="passwordConfirm"]').style.display = 'none';
     document.querySelector('label[for="passwordConfirm"]').style.display = 'none';
   } else {
@@ -110,8 +106,6 @@ document.getElementById("switch").onclick = (e) => {
     document.getElementById("title").textContent = "Registrierung";
     document.getElementById("submitBtn").textContent = "Registrieren";
     document.getElementById("switch").textContent = "Zum Login wechseln";
-
-    // Passwort-Bestätigung wieder anzeigen
     document.querySelector('input[name="passwordConfirm"]').style.display = 'inline';
     document.querySelector('label[for="passwordConfirm"]').style.display = 'inline';
   }
@@ -125,8 +119,6 @@ document.getElementById("toLoginBtn").onclick = () => {
   document.getElementById("switch").textContent = "Zur Registrierung wechseln";
   document.getElementById("formScreen").classList.add("active");
   document.getElementById("successScreen").classList.remove("active");
-
-  // Passwort-Bestätigung beim Login ausblenden
   document.querySelector('input[name="passwordConfirm"]').style.display = 'none';
   document.querySelector('label[for="passwordConfirm"]').style.display = 'none';
 };
