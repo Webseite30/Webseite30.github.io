@@ -106,8 +106,15 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   data.duration_ms = Math.round(performance.now() - startTime);
   startTime = null;
 
-  // Dummy-Ergebnis
-  const result = "registered";
+ const res = await fetch("/register", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data)
+});
+
+  const result = await res.text();
+
+
 
   if (result === "registered") {
     document.getElementById("registerForm").reset();
@@ -128,8 +135,14 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   data.duration_ms = Math.round(performance.now() - startTime);
   startTime = null;
 
-  // Dummy-Ergebnis
-  const result = "login ok";
+  const res = await fetch("/login", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(data)
+});
+
+const result = await res.text();
+
 
   if (result === "login ok") {
     document.getElementById("loginForm").reset();
