@@ -107,7 +107,10 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
     return;
   }
 
-  document.getElementById("regError").textContent = "";
+  // Timer stoppen und Anzahl der Versuche setzen
+  data.duration_ms = Math.round(performance.now() - startTime);
+  data.attempts = regAttempts;
+  startTime = null;
 
   const res = await fetch("/register", {
     method: "POST",
@@ -118,24 +121,15 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   const result = await res.text();
 
   if (result === "registered") {
-    data.duration_ms = Math.round(performance.now() - startTime);
-    data.attempts = regAttempts;
-    startTime = null;
-
-    await fetch("/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
     regAttempts = 0;
     document.getElementById("registerForm").reset();
+    document.getElementById("regError").textContent = "";
     show("successScreen");
-
   } else {
     document.getElementById("regError").textContent = "Fehler: " + result;
   }
 });
+
 
 // ---------------------------
 // LOGIN
@@ -148,6 +142,10 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const data = Object.fromEntries(new FormData(e.target));
   data.site_name = siteName;
 
+  // Timer stoppen und Versuche setzen
+  data.duration_ms = Math.round(performance.now() - startTime);
+  data.attempts = loginAttempts;
+
   const res = await fetch("/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -157,17 +155,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const result = await res.text();
 
   if (result === "login ok") {
-
-    data.duration_ms = Math.round(performance.now() - startTime);
-    data.attempts = loginAttempts;
     startTime = null;
-
-    await fetch("/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
     loginAttempts = 0;
 
     document.getElementById("loginForm").reset();
@@ -179,6 +167,7 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
     // Timer läuft weiter
   }
 });
+
 </script>
 
 
