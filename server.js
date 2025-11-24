@@ -38,25 +38,37 @@ async function initDb() {
 }
 
 // ===== Registrierung =====
-app.post("/register", async (req, res) => {
-  const { username, password, duration_ms, site_name } = req.body;
+document.getElementById("registerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  data.site_name = siteName;
 
-  if (!username || !password || !site_name) return res.status(400).send("Missing data");
+  // Passwort prüfen
+  if (data.password !== data.passwordConfirm) {
+    document.getElementById("regError").textContent = "Die Passwörter stimmen nicht überein!";
+    return;
+  }
+  document.getElementById("regError").textContent = "";
 
-  const hash = crypto.createHash("sha256").update(password).digest("hex");
+  // Dauer berechnen, auch wenn startTime null ist
+  data.duration_ms = Math.round(performance.now() - (startTime || performance.now()));
+  startTime = null;
 
-  try {
-    await pool.query(
-      `INSERT INTO actions (username, hash, action_type, success, duration_ms, site_name)
-       VALUES ($1, $2, 'register', true, $3, $4)`,
-      [username, hash, duration_ms, site_name]
-    );
-    res.send("registered");
-  } catch (e) {
-    console.error(e);
-    res.status(500).send("DB error");
+  const res = await fetch("/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  const result = (await res.text()).trim();
+
+  if (result === "registered") {
+    show("successScreen");
+  } else {
+    document.getElementById("regError").textContent = "Fehler: " + result;
   }
 });
+
 
 // ===== Login =====
 app.post("/login", async (req, res) => {
