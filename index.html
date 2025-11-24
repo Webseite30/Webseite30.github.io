@@ -3,8 +3,17 @@
 <head>
   <meta charset="utf-8">
   <title>Studie – Anmeldung</title>
+  <style>
+    .screen { display: none; }
+    .active { display: block; }
+    button { margin-top: 10px; }
+    .error { color: red; }
+  </style>
 </head>
 <body>
+
+<!-- Registrierung / Login Screen -->
+<div id="formScreen" class="screen active">
   <h2 id="title">Registrierung</h2>
 
   <form id="form">
@@ -14,21 +23,34 @@
     <label id="pwLabel">Passwort</label>
     <input name="password" type="password" required>
 
-    <button id="submitBtn">Absenden</button>
+    <label>Passwort wiederholen</label>
+    <input name="passwordConfirm" type="password" required>
+
+    <button id="submitBtn">Registrieren</button>
   </form>
+
+  <p class="error" id="errorMsg"></p>
 
   <p>
     <a href="#" id="switch">Zum Login wechseln</a>
   </p>
 
   <pre id="log"></pre>
+</div>
+
+<!-- Erfolgs-Screen -->
+<div id="successScreen" class="screen">
+  <h2>Erfolgreich registriert!</h2>
+  <p>Ihr Account wurde erstellt.</p>
+  <button id="toLoginBtn">Zum Login</button>
+</div>
 
 <script>
-let mode = "register";
+let mode = "register"; // register oder login
 let startTime = null;
 
 // Startzeit messen
-document.querySelectorAll("input").forEach(el => {
+document.querySelectorAll("#form input").forEach(el => {
   el.addEventListener("input", () => { if (!startTime) startTime = performance.now(); });
 });
 
@@ -37,6 +59,15 @@ document.getElementById("form").addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const data = Object.fromEntries(new FormData(e.target));
+
+  // Passwort-Check bei Registrierung
+  if (mode === "register" && data.password !== data.passwordConfirm) {
+    document.getElementById("errorMsg").textContent = "Die Passwörter stimmen nicht überein!";
+    return;
+  } else {
+    document.getElementById("errorMsg").textContent = "";
+  }
+
   const duration = Math.round(performance.now() - (startTime || performance.now()));
   startTime = null;
 
@@ -50,22 +81,56 @@ document.getElementById("form").addEventListener("submit", async (e) => {
     body: JSON.stringify(data)
   });
 
-  document.getElementById("log").textContent =
-    "Antwort: " + (await res.text());
+  const text = await res.text();
+
+  if (mode === "register" && res.ok) {
+    // Registrierung erfolgreich → Erfolgs-Screen zeigen
+    document.getElementById("formScreen").classList.remove("active");
+    document.getElementById("successScreen").classList.add("active");
+    return;
+  }
+
+  document.getElementById("log").textContent = "Antwort: " + text;
 });
 
-// Modus wechseln
-document.getElementById("switch").onclick = () => {
+// Modus wechseln zwischen Registrierung / Login
+document.getElementById("switch").onclick = (e) => {
+  e.preventDefault();
   if (mode === "register") {
     mode = "login";
     document.getElementById("title").textContent = "Login";
+    document.getElementById("submitBtn").textContent = "Login";
     document.getElementById("switch").textContent = "Zur Registrierung wechseln";
+
+    // Passwort-Bestätigung ausblenden beim Login
+    document.querySelector('input[name="passwordConfirm"]').style.display = 'none';
+    document.querySelector('label[for="passwordConfirm"]').style.display = 'none';
   } else {
     mode = "register";
     document.getElementById("title").textContent = "Registrierung";
+    document.getElementById("submitBtn").textContent = "Registrieren";
     document.getElementById("switch").textContent = "Zum Login wechseln";
+
+    // Passwort-Bestätigung wieder anzeigen
+    document.querySelector('input[name="passwordConfirm"]').style.display = 'inline';
+    document.querySelector('label[for="passwordConfirm"]').style.display = 'inline';
   }
 };
+
+// Nach Registrierung auf Login-Screen wechseln
+document.getElementById("toLoginBtn").onclick = () => {
+  mode = "login";
+  document.getElementById("title").textContent = "Login";
+  document.getElementById("submitBtn").textContent = "Login";
+  document.getElementById("switch").textContent = "Zur Registrierung wechseln";
+  document.getElementById("formScreen").classList.add("active");
+  document.getElementById("successScreen").classList.remove("active");
+
+  // Passwort-Bestätigung beim Login ausblenden
+  document.querySelector('input[name="passwordConfirm"]').style.display = 'none';
+  document.querySelector('label[for="passwordConfirm"]').style.display = 'none';
+};
 </script>
+
 </body>
 </html>
