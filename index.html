@@ -68,16 +68,17 @@
 const siteName = "Webseite_1"; 
 let startTime = null;
 
+// Fehlversuche
+let regAttempts = 0;
+let loginAttempts = 0;
+
 // ---------------------------
 // SCREEN SWITCHING & TIMER
 // ---------------------------
 function show(screenId) {
-  // Alle Screens verstecken
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  // Gewünschten Screen zeigen
   document.getElementById(screenId).classList.add("active");
 
-  // Timer NUR starten, wenn gerade KEIN Timer läuft
   if (startTime === null) {
     startTime = performance.now();
   }
@@ -86,6 +87,7 @@ function show(screenId) {
 document.getElementById("goToLoginBtn").onclick = () => {
   document.getElementById("loginForm").reset();
   document.getElementById("loginError").textContent = "";
+  loginAttempts = 0; 
   show("loginScreen");
 };
 
@@ -94,6 +96,9 @@ document.getElementById("goToLoginBtn").onclick = () => {
 // ---------------------------
 document.getElementById("registerForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  regAttempts++;
+
   const data = Object.fromEntries(new FormData(e.target));
   data.site_name = siteName;
 
@@ -113,20 +118,19 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
   const result = await res.text();
 
   if (result === "registered") {
-    // Timer nur JETZT stoppen
     data.duration_ms = Math.round(performance.now() - startTime);
+    data.attempts = regAttempts;
     startTime = null;
 
-    // Erfolg
-    document.getElementById("registerForm").reset();
-    show("successScreen");
-
-    // Dauer an DB senden
     await fetch("/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...data })
+      body: JSON.stringify(data)
     });
+
+    regAttempts = 0;
+    document.getElementById("registerForm").reset();
+    show("successScreen");
 
   } else {
     document.getElementById("regError").textContent = "Fehler: " + result;
@@ -138,6 +142,9 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 // ---------------------------
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  loginAttempts++;
+
   const data = Object.fromEntries(new FormData(e.target));
   data.site_name = siteName;
 
@@ -150,27 +157,29 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const result = await res.text();
 
   if (result === "login ok") {
-    // Timer nur JETZT stoppen
+
     data.duration_ms = Math.round(performance.now() - startTime);
+    data.attempts = loginAttempts;
     startTime = null;
 
-    // Erfolg
+    await fetch("/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+
+    loginAttempts = 0;
+
     document.getElementById("loginForm").reset();
     document.getElementById("loginError").textContent = "";
     show("loginSuccessScreen");
 
-    // Dauer an DB senden
-    await fetch("/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...data })
-    });
-
   } else {
-    document.getElementById("loginError").textContent = "Login fehlgeschlagen!";
-    // Timer läuft weiter!
+    document.getElementById("loginError").textContent = "Login fehlgeschlagen! Bitte erneut versuchen.";
+    // Timer läuft weiter
   }
 });
 </script>
+
 
 
