@@ -56,6 +56,14 @@
   <button id="goToLoginBtn">Weiter zum Login</button>
 </div>
 
+  <!-- Erfolgsbildschirm nach Login -->
+<div id="loginSuccessScreen" class="screen">
+  <h2>Login erfolgreich!</h2>
+  <p>Sie haben sich erfolgreich eingeloggt. Bitte füllen Sie nun den Fragebogen aus.</p>
+  <p>Den Link zum Fragebogen, finden Sie in der E-mail.</p>
+</div>
+
+
 <script>
 const siteName = "Webseite_1"; 
 let startTime = null;
@@ -124,10 +132,13 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   const result = "login ok";
 
   if (result === "login ok") {
-    document.getElementById("loginError").textContent = "Login erfolgreich!";
+    document.getElementById("loginForm").reset();
+    document.getElementById("loginError").textContent = "";
+    show("loginSuccessScreen"); // ➜ Wechsel zum neuen Screen
   } else {
     document.getElementById("loginError").textContent = "Login fehlgeschlagen!";
   }
 });
+
 </script>
 
