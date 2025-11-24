@@ -27,10 +27,10 @@ async function initDb() {
       username TEXT,
       hash TEXT,
       action_type TEXT NOT NULL,
-      attempts INT
       success BOOLEAN,
       duration_ms INT,
       site_name TEXT,
+      attempts INT,
       created_at TIMESTAMP DEFAULT NOW()
     );
   `);
