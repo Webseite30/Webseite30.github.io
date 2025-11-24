@@ -19,43 +19,37 @@ const pool = new Pool({
   ssl: { rejectUnauthorized: false }
 });
 
-// ===== Tabellen automatisch anlegen =====
+// ===== Tabelle automatisch anlegen =====
 async function initDb() {
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      username TEXT PRIMARY KEY,
-      hash TEXT NOT NULL,
-      reg_time_ms INT
-    );
-  `);
-
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS logins (
+    CREATE TABLE IF NOT EXISTS actions (
       id SERIAL PRIMARY KEY,
       username TEXT,
-      login_time_ms INT,
+      hash TEXT,
+      action_type TEXT NOT NULL,
       success BOOLEAN,
+      duration_ms INT,
+      site_name TEXT,
       created_at TIMESTAMP DEFAULT NOW()
     );
   `);
 
-  console.log("Datenbank-Tabellen geprüft / erstellt.");
+  console.log("Datenbanktabelle 'actions' geprüft / erstellt.");
 }
 
 // ===== Registrierung =====
 app.post("/register", async (req, res) => {
-  const { username, password, duration_ms } = req.body;
+  const { username, password, duration_ms, site_name } = req.body;
 
-  if (!username || !password) return res.status(400).send("Missing username or password");
+  if (!username || !password || !site_name) return res.status(400).send("Missing data");
 
   const hash = crypto.createHash("sha256").update(password).digest("hex");
 
   try {
     await pool.query(
-      `INSERT INTO users (username, hash, reg_time_ms)
-       VALUES ($1, $2, $3)
-       ON CONFLICT (username) DO NOTHING`,
-      [username, hash, duration_ms]
+      `INSERT INTO actions (username, hash, action_type, success, duration_ms, site_name)
+       VALUES ($1, $2, 'register', true, $3, $4)`,
+      [username, hash, duration_ms, site_name]
     );
     res.send("registered");
   } catch (e) {
@@ -66,24 +60,24 @@ app.post("/register", async (req, res) => {
 
 // ===== Login =====
 app.post("/login", async (req, res) => {
-  const { username, password, duration_ms } = req.body;
+  const { username, password, duration_ms, site_name } = req.body;
 
-  if (!username || !password) return res.status(400).send("Missing username or password");
+  if (!username || !password || !site_name) return res.status(400).send("Missing data");
 
   const hash = crypto.createHash("sha256").update(password).digest("hex");
 
   try {
     const result = await pool.query(
-      `SELECT 1 FROM users WHERE username=$1 AND hash=$2`,
+      `SELECT 1 FROM actions WHERE username=$1 AND hash=$2 AND action_type='register' LIMIT 1`,
       [username, hash]
     );
 
     const success = result.rowCount > 0;
 
     await pool.query(
-      `INSERT INTO logins (username, login_time_ms, success)
-       VALUES ($1, $2, $3)`,
-      [username, duration_ms, success]
+      `INSERT INTO actions (username, action_type, success, duration_ms, site_name)
+       VALUES ($1, 'login', $2, $3, $4)`,
+      [username, success, duration_ms, site_name]
     );
 
     res.send(success ? "login ok" : "login failed");
