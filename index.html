@@ -129,6 +129,10 @@ document.getElementById("registerForm").addEventListener("submit", async (e) => 
 // ---------------------------
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  // Timer neu starten für jeden Login-Versuch
+  dataStart = performance.now();
+
   const data = Object.fromEntries(new FormData(e.target));
   data.site_name = siteName;
 
@@ -136,22 +140,23 @@ document.getElementById("loginForm").addEventListener("submit", async (e) => {
   startTime = null;
 
   const res = await fetch("/login", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(data)
-});
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 
-const result = await res.text();
-
+  const result = await res.text();
 
   if (result === "login ok") {
-    document.getElementById("loginForm").reset();
     document.getElementById("loginError").textContent = "";
-    show("loginSuccessScreen"); // ➜ Wechsel zum neuen Screen
+    document.getElementById("loginForm").reset();
+    show("loginSuccessScreen");
   } else {
-    document.getElementById("loginError").textContent = "Login fehlgeschlagen!";
+    document.getElementById("loginError").textContent = "Login fehlgeschlagen! Bitte erneut versuchen.";
+    startTime = performance.now(); // Timer für den nächsten Versuch wieder starten
   }
 });
+
 
 </script>
 
