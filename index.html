@@ -73,6 +73,34 @@
 
     .screen { display: none; }
     .active { display: block; }
+
+        /* ===== Info-Box rechts ===== */
+    .main-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 30px;
+      max-width: 900px;
+      margin: 50px auto;
+    }
+    
+    .info-box {
+      width: 300px;
+      background-color: #fff4ff;
+      border: 1px solid #d49bf7;
+      border-radius: 10px;
+      padding: 20px;
+      color: #4b0082;
+      font-size: 14px;
+      line-height: 1.5;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    
+    @media (max-width: 800px) {
+      .main-container { flex-direction: column; align-items: center; }
+      .info-box { width: 90%; margin-top: 20px; }
+    }
+
   </style>
 </head>
 <body>
@@ -80,19 +108,35 @@
 <header>Bank 123</header>
 
 <!-- Registrierung -->
-<div id="registerScreen" class="container screen active">
-  <h2>Registrierung</h2>
-  <form id="registerForm">
-    <label>Username</label>
-    <input name="username" required>
-    <label>Passwort</label>
-    <input name="password" type="password" required>
-    <label>Passwort wiederholen</label>
-    <input name="passwordConfirm" type="password" required>
-    <button>Registrieren</button>
-  </form>
-  <p class="error" id="regError"></p>
+<!-- Registrierung -->
+<div id="registerScreen" class="screen active">
+  <div class="main-container">
+
+    <!-- Originaler Registrierungs-Container -->
+    <div class="container">
+      <h2>Registrierung</h2>
+      <form id="registerForm">
+        <label>Username</label>
+        <input name="username" required>
+        <label>Passwort</label>
+        <input name="password" type="password" required>
+        <label>Passwort wiederholen</label>
+        <input name="passwordConfirm" type="password" required>
+        <button>Registrieren</button>
+      </form>
+      <p class="error" id="regError"></p>
+    </div>
+
+    <!-- 🟣 INFO-BOX (NEU) -->
+    <div class="info-box">
+      <h3>Hinweis</h3>
+      <p>Bitte beachten Sie: Diese Registrierung dient ausschließlich Studienzwecken.</p>
+      <p>Ihre eingegebenen Daten werden nur zur Auswertung der Untersuchung verwendet.</p>
+    </div>
+
+  </div>
 </div>
+
 
 <!-- Login -->
 <div id="loginScreen" class="container screen">
