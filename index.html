@@ -132,10 +132,10 @@
     <div class="info-box">
       <strong>Benutzername soll Ihr Muttercode sein:</strong>
       <ul>
-        <li>Die ersten beiden Buchstaben des Vornamens der Mutter</li>
-        <li>Die letzten beiden Buchstaben des eigenen Geburtsorts</li>
-        <li>Der Geburtsmonat des Vaters als Zahl (z. B. Januar = 01)</li>
-        <li>Der letzte Buchstabe des eigenen Vornamens</li>
+        <li>1. Die ersten beiden Buchstaben des Vornamens der Mutter</li>
+        <li>2. Die letzten beiden Buchstaben des eigenen Geburtsorts</li>
+        <li>3. Der Geburtsmonat des Vaters als Zahl (z. B. Januar = 01)</li>
+        <li>4. Der letzte Buchstabe des eigenen Vornamens</li>
       </ul>
     </div>
 
@@ -166,19 +166,26 @@
 <!-- Erfolgs-Screen Login -->
 <div id="loginSuccessScreen" class="container screen">
   <h2>Login erfolgreich!</h2>
-  <p>Sie haben sich erfolgreich eingeloggt. Bitte füllen Sie nun den Fragebogen aus.</p>
-  <p>Den Link zum Fragebogen finden Sie hier:
-    <a href="https://study.hcs.ruhr-uni-bochum.de/jfe/form/SV_3IWHPu7egUatFWu"> Fragebogen </a> oder in der Email.</p>
-</div>
 
+  <div id="surveyText">
+    <p>Sie haben sich erfolgreich eingeloggt. Bitte füllen Sie nun den Fragebogen aus.</p>
+    <p>Den Link zum Fragebogen finden Sie hier:
+    <a href="https://study.hcs.ruhr-uni-bochum.de/jfe/form/SV_3IWHPu7egUatFWu"> Fragebogen </a> oder in der Email.
+  </div>
+</div>
+  
 <script>
 const siteName = "Bank123"; 
 let startTime = null;
 
-// 🔁 Direkt zum Login wechseln, wenn ?mode=login gesetzt ist
+// Direkt zum Login wechseln, wenn ?mode=login gesetzt ist
 const params = new URLSearchParams(window.location.search);
 if (params.get("mode") === "login") {
-  show("loginScreen");
+  if (mode === "login") {
+  const surveyDiv = document.getElementById("surveyText");
+  if (surveyDiv) {
+    surveyDiv.style.display = "none";
+  }
 }
   
 // Fehlversuche
