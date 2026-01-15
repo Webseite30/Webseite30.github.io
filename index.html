@@ -132,10 +132,10 @@
     <div class="info-box">
       <strong>Benutzername soll Ihr Muttercode sein:</strong>
       <ul>
-        <li>1. Die ersten beiden Buchstaben des Vornamens der Mutter</li>
-        <li>2. Die letzten beiden Buchstaben des eigenen Geburtsorts</li>
-        <li>3. Der Geburtsmonat des Vaters als Zahl (z. B. Januar = 01)</li>
-        <li>4. Der letzte Buchstabe des eigenen Vornamens</li>
+        <li>Die ersten beiden Buchstaben des Vornamens der Mutter</li>
+        <li>Die letzten beiden Buchstaben des eigenen Geburtsorts</li>
+        <li>Der Geburtsmonat des Vaters als Zahl (z. B. Januar = 01)</li>
+        <li>Der letzte Buchstabe des eigenen Vornamens</li>
       </ul>
     </div>
 
@@ -180,7 +180,7 @@ let startTime = null;
 
 // Direkt zum Login wechseln, wenn ?mode=login gesetzt ist
 const params = new URLSearchParams(window.location.search);
-if (params.get("mode") === "login") {
+const mode = params.get("mode");
   if (mode === "login") {
   const surveyDiv = document.getElementById("surveyText");
   if (surveyDiv) {
