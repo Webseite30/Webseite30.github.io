@@ -175,6 +175,12 @@
 const siteName = "Bank123"; 
 let startTime = null;
 
+// 🔁 Direkt zum Login wechseln, wenn ?mode=login gesetzt ist
+const params = new URLSearchParams(window.location.search);
+if (params.get("mode") === "login") {
+  show("loginScreen");
+}
+  
 // Fehlversuche
 let regAttempts = 0;
 let loginAttempts = 0;
