@@ -166,12 +166,9 @@
 <!-- Erfolgs-Screen Login -->
 <div id="loginSuccessScreen" class="container screen">
   <h2>Login erfolgreich!</h2>
-
-  <div id="surveyText">
     <p>Sie haben sich erfolgreich eingeloggt. Bitte füllen Sie nun den Fragebogen aus.</p>
     <p>Den Link zum Fragebogen finden Sie hier:
     <a href="https://study.hcs.ruhr-uni-bochum.de/jfe/form/SV_3IWHPu7egUatFWu"> Fragebogen </a> oder in der Email.</p>
-  </div>
 </div>
   
 <script>
@@ -180,12 +177,8 @@ let startTime = null;
 
 // Direkt zum Login wechseln, wenn ?mode=login gesetzt ist
 const params = new URLSearchParams(window.location.search);
-const mode = params.get("mode");
-  if (mode === "login") {
-  const surveyDiv = document.getElementById("surveyText");
-  if (surveyDiv) {
-    surveyDiv.style.display = "none";
-  }
+if (params.get("mode") === "login") {
+  show("loginScreen");
 }
   
 // Fehlversuche
