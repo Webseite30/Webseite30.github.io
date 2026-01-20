@@ -72,12 +72,25 @@
     }
 
    .screen {
-      position: absolute;     /* raus aus dem Layout */
-      clip: rect(0 0 0 0);    /* Inhalt unsichtbar */
-      width: 1px;             /* minimaler Platz */
-      height: 1px;            /* minimaler Platz */
-      overflow: hidden;       /* versteckt */
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      border: 0;
+      clip-path: inset(50%);
+      white-space: nowrap; /* verhindert, dass Inhalt sichtbar wird */
     }
+
+  .active {
+      position: static;
+      width: auto;
+      height: auto;
+      clip-path: none;
+      overflow: visible;
+    }
+
     
     .active {
         position: static;       /* normal im Layout */
