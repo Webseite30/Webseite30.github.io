@@ -71,8 +71,16 @@
       text-align: center;
     }
 
-    .screen { display: none; }
-    .active { display: block; }
+    .screen {
+    visibility: hidden;
+    position: absolute;
+    left: -9999px;
+    }
+    .active {
+      visibility: visible;
+      position: static;
+    }
+
 
     /* ===== Flex Container für Form + Info Box ===== */
     .main-container {
