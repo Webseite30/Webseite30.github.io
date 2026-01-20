@@ -72,16 +72,21 @@
     }
 
    .screen {
-    display: block;      /* sichtbar genug für Browser */
-    height: 0;           /* für Nutzer unsichtbar */
-    overflow: hidden;    /* Inhalte nicht sichtbar */
-    position: relative;  /* wichtig, damit es im Layout bleibt */
+      position: absolute;     /* raus aus dem Layout */
+      clip: rect(0 0 0 0);    /* Inhalt unsichtbar */
+      width: 1px;             /* minimaler Platz */
+      height: 1px;            /* minimaler Platz */
+      overflow: hidden;       /* versteckt */
     }
     
     .active {
-    height: auto;        /* Inhalte sichtbar */
-    overflow: visible;   /* scrollbare Inhalte */
+        position: static;       /* normal im Layout */
+        clip: auto;             /* sichtbar */
+        width: auto;
+        height: auto;
+        overflow: visible;
     }
+
 
 
 
