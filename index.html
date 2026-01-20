@@ -116,14 +116,17 @@
     <!-- Registrierung Formular -->
     <div class="container">
       <h2>Registrierung</h2>
-      <form id="registerForm">
+      <form id="registerForm" action="/register" method="post">
         <label>Username</label>
-        <input name="username" required>
+        <input name="username" required autocomplete="username">
+        
         <label>Passwort</label>
-        <input name="password" type="password" required>
+        <input name="password" type="password" required autocomplete="new-password">
+        
         <label>Passwort wiederholen</label>
-        <input name="passwordConfirm" type="password" required>
-        <button>Registrieren</button>
+        <input name="passwordConfirm" type="password" required autocomplete="new-password">
+        
+        <button type="submit">Registrieren</button>
       </form>
       <p class="error" id="regError"></p>
     </div>
@@ -148,9 +151,9 @@
   <h2>Login</h2>
   <form id="loginForm">
     <label>Username</label>
-    <input name="username" required>
+    <input name="username" autocomplete="username" required>
     <label>Passwort</label>
-    <input name="password" type="password" required>
+    <input name="password" type="password" autocomplete="current-password" required>
     <button>Login</button>
   </form>
   <p class="error" id="loginError"></p>
