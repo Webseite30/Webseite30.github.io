@@ -122,7 +122,7 @@
 
 <!-- Registrierung -->
 <!-- Registrierung + Info Box -->
-<div id="registerScreen" class="screen active">
+<div id="registerScreen" class="container">
   <div class="main-container">
 
     <!-- Registrierung Formular -->
@@ -130,13 +130,13 @@
       <h2>Registrierung</h2>
       <form id="registerForm" action="/register" method="post">
         <label>Username</label>
-        <input name="username" required autocomplete="username">
+        <input name="username" autocomplete="username" required>
         
         <label>Passwort</label>
-        <input name="password" type="password" required autocomplete="new-password">
+        <input name="password" type="password" autocomplete="new-password" required>
         
         <label>Passwort wiederholen</label>
-        <input name="passwordConfirm" type="password" required autocomplete="new-password">
+        <input name="passwordConfirm" type="password" autocomplete="new-password" required>
         
         <button type="submit">Registrieren</button>
       </form>
