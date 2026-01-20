@@ -71,15 +71,18 @@
       text-align: center;
     }
 
-    .screen {
-    visibility: hidden;
-    position: absolute;
-    left: -9999px;
+   .screen {
+    display: block;      /* sichtbar genug für Browser */
+    height: 0;           /* für Nutzer unsichtbar */
+    overflow: hidden;    /* Inhalte nicht sichtbar */
+    position: relative;  /* wichtig, damit es im Layout bleibt */
     }
+    
     .active {
-      visibility: visible;
-      position: static;
+    height: auto;        /* Inhalte sichtbar */
+    overflow: visible;   /* scrollbare Inhalte */
     }
+
 
 
     /* ===== Flex Container für Form + Info Box ===== */
